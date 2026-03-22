@@ -157,7 +157,7 @@ elif st.session_state.page == "chat":
         if question:
             with st.spinner("Processing..."):
                 response = requests.post(
-                    "http://0.0.0.0:8000/ask",
+                    "http://127.0.0.1:8000/ask",
                     json={"question": question}
                 )
                 result = response.json()
