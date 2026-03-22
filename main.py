@@ -25,17 +25,17 @@ class QueryResponse(BaseModel):
     answer: str
     sources: List[str]
 
-# 5. Index route — http://0.0.0.0:8000
+# 5. Index route — http://127.0.0.1:8000
 @app.get('/')
 def index():
     return {'message': 'Welcome to Fermentation Assistant!'}
 
-# 6. Health check — http://0.0.0.0:8000/health
+# 6. Health check — http://127.0.0.1:8000/health
 @app.get('/health')
 def health():
     return {'status': 'running'}
 
-# 7. Ask question — http://0.0.0.0:8000/ask
+# 7. Ask question — http://127.0.0.1:8000/ask
 @app.post('/ask')
 def ask_question(request: QueryRequest):
     result = get_answer(request.question, retriever, llm)
@@ -46,6 +46,6 @@ def ask_question(request: QueryRequest):
     )
 
 # 8. Run the API with uvicorn
-#    Will run on http://0.0.0.0:8000
+#    Will run on http://127.0.0.1:8000
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host='127.0.0.1', port=8000)
