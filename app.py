@@ -1,6 +1,6 @@
 import streamlit as st
-import requests
 import base64
+from rag_pipeline import initialize_rag, get_answer
 
 st.set_page_config(page_title="Fermentation AI", layout="centered")
 
@@ -70,7 +70,7 @@ button[kind="secondary"]:hover {{
     color: #00aced !important;
 }}
 
-/* FOOTER FIX (CENTER PROPERLY) */
+/* FOOTER FIX */
 .footer {{
     position: fixed;
     bottom: 0;
@@ -115,6 +115,10 @@ if "answer" not in st.session_state:
 if "sources" not in st.session_state:
     st.session_state.sources = []
 
+# ✅ FIX: initialize RAG once
+if "retriever" not in st.session_state:
+    st.session_state.retriever, st.session_state.llm = initialize_rag()
+
 # ---------- WELCOME ----------
 if st.session_state.page == "welcome":
 
@@ -130,7 +134,6 @@ if st.session_state.page == "welcome":
 # ---------- CHAT ----------
 elif st.session_state.page == "chat":
 
-    # HOME (TOP RIGHT CLEAN)
     col1, col2 = st.columns([9,1])
     with col2:
         if st.button("Home"):
@@ -141,29 +144,29 @@ elif st.session_state.page == "chat":
 
     st.markdown("<h1>Ask Your Question</h1>", unsafe_allow_html=True)
 
-    # INPUT
     question = st.text_input(
         "Enter your question:",
         placeholder="Enter your text here..."
     )
 
-    # CENTER BUTTON
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         submit = st.button("Get Answer", use_container_width=True)
 
-    # API CALL
+    # ✅ FIXED API CALL BLOCK
     if submit:
         if question:
             with st.spinner("Processing..."):
-                response = requests.post(
-                    "http://127.0.0.1:8000/ask",
-                    json={"question": question}
-                )
-                result = response.json()
 
-            st.session_state.answer = result["answer"]
-            st.session_state.sources = result["sources"]
+                result = get_answer(
+                    question,
+                    st.session_state.retriever,
+                    st.session_state.llm
+                )
+
+                st.session_state.answer = result["answer"]
+                st.session_state.sources = result["sources"]
+
         else:
             st.warning("Enter a question")
 
@@ -192,7 +195,6 @@ elif st.session_state.page == "chat":
         for s in st.session_state.sources:
             st.write(f"- {s}")
 
-        # ASK ANOTHER CENTER
         col1, col2, col3 = st.columns([1,2,1])
         with col2:
             if st.button("Ask Another", use_container_width=True):
