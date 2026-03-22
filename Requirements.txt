@@ -1,3 +1,6 @@
+streamlit
+fastapi
+uvicorn
 langchain
 langchain-core
 langchain-community
@@ -6,5 +9,5 @@ pymupdf
 sentence-transformers
 faiss-cpu
 chromadb
-langchain-groq
 python-dotenv
+requests
